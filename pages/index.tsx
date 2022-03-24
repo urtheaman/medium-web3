@@ -1,10 +1,17 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import Header from "../components/Header";
+import { sanityClient, urlFor } from "../sanity";
+import { Post } from "../type";
 
-const Home: NextPage = () => {
-  console.log("This is a log");
+interface Props {
+  posts: Post[];
+}
+
+const Home: NextPage<Props> = ({ posts }) => {
+  console.log("This is a log", posts);
   return (
     <div className="max-w-7xl mx-auto">
       <Head>
@@ -14,7 +21,7 @@ const Home: NextPage = () => {
       </Head>
 
       <Header />
-      {/* Banner */}
+      {/* Banner start */}
       <div className="flex justify-between items-center bg-yellow-400 border-y border-black py-10 lg:py-0">
         <div className="px-10 space-y-5">
           <h1 className="text-6xl max-w-xl font-serif">
@@ -35,8 +42,82 @@ const Home: NextPage = () => {
           alt="Medium logo"
         />
       </div>
+      {/* Banner end */}
+      {/* Posts start */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mt-6 md:mt-0 p-4 md:p-6">
+        {posts.map((post) => {
+          return (
+            <Link href={`/post/${post.slug.current}`} key={post._id} passHref>
+              <div className=" group cursor-pointer border rounded-lg">
+                <div className="relative h-60 w-full rounded-t-lg overflow-hidden">
+                  <Image
+                    className="shadow-lg rounded-t-lg group-hover:scale-105 transition-transform duration-200 ease-in-out"
+                    src={urlFor(post.mainImage).url()!}
+                    alt={post.title}
+                    layout="fill"
+                    objectFit="cover"
+                  />
+                </div>
+
+                <div className="flex justify-between p-4 bg-white">
+                  <div className="flex-1 flex flex-col">
+                    <h3 className="text-lg font-bold ">
+                      {post.title
+                        .split(" ")
+                        .filter((_, index) => index < 4)
+                        .join(" ")}
+                      ...
+                    </h3>
+                    <p className="text-sm">
+                      {post.description
+                        .split(" ")
+                        .filter((_, index) => index < 6)
+                        .join(" ")}
+                      ...
+                    </p>
+                    <p className="text-xs font-medium self-start">
+                      - {post.author.name}
+                    </p>
+                  </div>
+
+                  <div className="relative h-12 w-12 overflow-hidden rounded-full">
+                    <Image
+                      layout="fill"
+                      objectFit="cover"
+                      alt={post.author.name}
+                      src={urlFor(post.author.profileImage).url()!}
+                    />
+                  </div>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 };
 
 export default Home;
+
+export const getServerSideProps = async () => {
+  const query = `*[_type == 'post']{
+  _id,
+  title,
+  author-> {
+  name,
+  profileImage
+},
+description,
+mainImage,
+slug
+}`;
+
+  const posts = await sanityClient.fetch(query);
+
+  return {
+    props: {
+      posts,
+    },
+  };
+};
