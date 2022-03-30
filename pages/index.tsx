@@ -48,10 +48,10 @@ const Home: NextPage<Props> = ({ posts }) => {
         {posts.map((post) => {
           return (
             <Link href={`/post/${post.slug.current}`} key={post._id} passHref>
-              <div className=" group cursor-pointer border rounded-lg">
+              <div className="shadow-md hover:shadow-lg mt-4 group cursor-pointer border rounded-lg">
                 <div className="relative h-60 w-full rounded-t-lg overflow-hidden">
                   <Image
-                    className="shadow-lg rounded-t-lg group-hover:scale-105 transition-transform duration-200 ease-in-out"
+                    className="rounded-t-lg group-hover:scale-105 transition-transform duration-200 ease-in-out"
                     src={urlFor(post.mainImage).url()!}
                     alt={post.title}
                     layout="fill"
@@ -59,19 +59,19 @@ const Home: NextPage<Props> = ({ posts }) => {
                   />
                 </div>
 
-                <div className="flex justify-between p-4 bg-white">
+                <div className="flex rounded-lg justify-between p-4 bg-white">
                   <div className="flex-1 flex flex-col">
                     <h3 className="text-lg font-bold ">
                       {post.title
                         .split(" ")
-                        .filter((_, index) => index < 4)
+                        .filter((_, index) => index < 6)
                         .join(" ")}
                       ...
                     </h3>
                     <p className="text-sm">
                       {post.description
                         .split(" ")
-                        .filter((_, index) => index < 6)
+                        .filter((_, index) => index < 12)
                         .join(" ")}
                       ...
                     </p>
