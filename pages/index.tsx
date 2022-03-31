@@ -11,7 +11,6 @@ interface Props {
 }
 
 const Home: NextPage<Props> = ({ posts }) => {
-  console.log("This is a log", posts);
   return (
     <div className="max-w-7xl mx-auto">
       <Head>
@@ -35,7 +34,6 @@ const Home: NextPage<Props> = ({ posts }) => {
             connect with millions of readers.
           </h2>
         </div>
-
         <img
           className="hidden md:inline-flex h-32 lg:h-full"
           src="https://accountabilitylab.org/wp-content/uploads/2020/03/Medium-logo.png"

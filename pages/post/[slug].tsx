@@ -1,14 +1,20 @@
 import { GetStaticProps, NextPage } from "next";
 import Image from "next/image";
+import PortableText from "react-portable-text";
 import Header from "../../components/Header";
 import { sanityClient, urlFor } from "../../sanity";
 import { Post } from "../../type";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
 
 interface Props {
   post: Post;
 }
 
 const Post: NextPage<Props> = ({ post }) => {
+  const { register, handleSubmit } = useForm();
+  const [data, setData] = useState("");
+
   return (
     <main>
       <Header />
@@ -43,7 +49,77 @@ const Post: NextPage<Props> = ({ post }) => {
             published at {new Date(post._createdAt).toLocaleString()}
           </p>
         </div>
+
+        <PortableText
+          projectId={process.env.NEXT_PUBLIC_PROJECT_ID}
+          dataset={process.env.NEXT_PUBLIC_PROJECT_DATASET}
+          content={post.body}
+          serializers={{
+            h1: (props: any) => {
+              return <h1 className="text-4xl font-bold my-5" {...props} />;
+            },
+            h2: (props: any) => {
+              return <h2 className="text-2xl font-bold my-5" {...props} />;
+            },
+            h3: (props: any) => {
+              return <h3 className="text-2xl font-bold my-5" {...props} />;
+            },
+            li: ({ children }: any) => {
+              return <li className="ml-4 list-disc">{children}</li>;
+            },
+            link: ({ href, children }: any) => {
+              return (
+                <a href={href} className="text-blue-500 hover:underline">
+                  {children}
+                </a>
+              );
+            },
+          }}
+        />
       </article>
+
+      <hr className="max-w-lg my-5 mx-auto border border-yellow-500" />
+
+      <form
+        className="flex flex-col mx-w-2xl mx-auto mb-10 max-w-3xl p-5"
+        onSubmit={handleSubmit((data) => setData(JSON.stringify(data)))}
+      >
+        <h3 className="text-sm text-yellow-500">Enjoyed this article?</h3>
+        <h4 className="text-3xl font-bold">Leave a comment below</h4>
+        <hr className="py-3 mt-2" />
+        <label className="block mb-5">
+          <span className="text-gray-700">Name</span>
+          <input
+            {...register("name", { required: true })}
+            className="shadow border rounded py-2 px-3 form-input mt-1 block ring-yellow-500 focus:ring w-full outline-none transition-all duration-100 ease-out"
+            placeholder="Sarah williams"
+            type="text"
+          />
+        </label>
+        <label className="block mb-5">
+          <span className="text-gray-700">Email</span>
+          <input
+            {...register("email", { required: true })}
+            className="shadow border rounded py-2 px-3 form-input mt-1 block ring-yellow-500 w-full focus:ring outline-none transition-all duration-100 ease-out"
+            placeholder="sarah@williams.com"
+            type="email"
+          />
+        </label>
+        <label className="block mb-5">
+          <span className="text-gray-700">Comment</span>
+          <textarea
+            {...register("comment", { required: true })}
+            className="shadow border rounded py-2 px-3 form-textarea mt-1 block w-full ring-yellow-500 focus:ring outline-none transition-all duration-100 ease-out"
+            placeholder="type your comment here"
+            rows={8}
+          ></textarea>
+        </label>
+
+        <input
+          type="submit"
+          className="shadow bg-yellow-500 hover:bg-yellow-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded cursor-pointer"
+        />
+      </form>
     </main>
   );
 };
